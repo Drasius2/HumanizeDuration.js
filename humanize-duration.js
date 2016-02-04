@@ -268,11 +268,9 @@
     }
   }
 
-  // You can create a humanizer, which returns a function with defaults
-  // parameters.
-  function humanizer (passedOptions) {
-    var result = function humanizer (ms, humanizerOptions) {
-      var options = extend({}, result, humanizerOptions || {})
+  function humanizer (humanizerOptions) {
+    var result = function humanizer (ms, oneTimeOptions) {
+      var options = extend({}, result, oneTimeOptions || {})
       return doHumanization(ms, options)
     }
 
@@ -293,7 +291,7 @@
         s: 1000,
         ms: 1
       }
-    }, passedOptions)
+    }, humanizerOptions)
   }
 
   // The main function is just a wrapper around a default humanizer.
@@ -301,6 +299,9 @@
 
   // doHumanization does the bulk of the work.
   function doHumanization (ms, options) {
+    var i
+    var len = options.units.length
+
     // Make sure we have a positive number.
     // Has the nice sideffect of turning Number objects into primitives.
     ms = Math.abs(ms)
@@ -310,36 +311,20 @@
       throw new Error('No language ' + dictionary + '.')
     }
 
-    var result = []
+    var byUnit = []
+    var unitMsList = []
 
-    // Start at the top and keep removing units, bit by bit.
-    var unitName, unitMS, unitCount
-    for (var i = 0, len = options.units.length; i < len; i++) {
-      unitName = options.units[i]
-      unitMS = options.unitMeasures[unitName]
+    for (i = 0; i < len; i++) {
+      var unitName = options.units[i]
+      var unitMs = options.unitMeasures[unitName]
 
-      // What's the number of full units we can fit?
-      if (i + 1 === len) {
-        unitCount = ms / unitMS
-        if (options.round) {
-          unitCount = Math.round(unitCount)
-        }
-      } else {
-        unitCount = Math.floor(ms / unitMS)
-      }
+      byUnit.push(ms / unitMs)
 
-      // Add the string.
-      if (unitCount) {
-        result.push(render(unitCount, unitName, dictionary, options))
-      }
+      ms -= unitMs
+    }
 
-      // Do we have enough units?
-      if (options.largest && options.largest <= result.length) {
-        break
-      }
-
-      // Remove what we just figured out.
-      ms -= unitCount * unitMS
+    for (i = 0; i < len; i++) {
+      byUnit[i]
     }
 
     if (result.length) {

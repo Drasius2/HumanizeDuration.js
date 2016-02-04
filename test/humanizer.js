@@ -84,6 +84,10 @@ describe('humanizer', function () {
     assert.equal(h(1500), '2 seconds')
     assert.equal(h(121499), '2 minutes, 1 second')
     assert.equal(h(121500), '2 minutes, 2 seconds')
+
+    assert.equal(h(3692131200000, {
+      units: ['y', 'mo']
+    }), '117 years')
   })
 
   it('can ask for the largest units', function () {
